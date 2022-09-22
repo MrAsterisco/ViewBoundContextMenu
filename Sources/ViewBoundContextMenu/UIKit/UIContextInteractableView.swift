@@ -75,11 +75,28 @@ extension ContextInteractableView: UIContextMenuInteractionDelegate {
       guard let self = self else { return nil }
       return UIMenu(
         title: "",
-        children: self.actions.map { action in
-          UIAction(title: action.title, image: action.image, identifier: .init(rawValue: action.identifier)) { _ in
-            action.action()
-          }
-        }
+        children: self.actions.map(\.asMenuElement)
+      )
+    }
+  }
+}
+
+private extension ContextAction {
+  var asMenuElement: UIMenuElement {
+    if children.isEmpty {
+      return UIAction(
+        title: title,
+        image: image,
+        identifier: .init(identifier)
+      ) { _ in
+        action?()
+      }
+    } else {
+      return UIMenu(
+        title: title,
+        image: image,
+        identifier: .init(identifier),
+        children: children.map(\.asMenuElement)
       )
     }
   }

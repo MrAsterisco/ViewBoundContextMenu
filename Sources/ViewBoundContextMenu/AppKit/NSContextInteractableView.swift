@@ -4,7 +4,13 @@ import SwiftUI
 import SwiftUIX
 
 public class ContextInteractableView: NSView {
-  var actions = [ContextAction]()
+  var actions = [ContextAction]() {
+    didSet {
+      flattedActions = actions
+        .reduce([ContextAction](), { $0 + [$1] + $1.children })
+    }
+  }
+  private var flattedActions = [ContextAction]()
   
   var content: (() -> any View)? {
     didSet {
@@ -23,11 +29,7 @@ public class ContextInteractableView: NSView {
     
     actions
       .map {
-        let item = NSMenuItem(title: $0.title, action: #selector(handle(sender:)), keyEquivalent: "")
-        item.target = self
-        item.identifier = .init($0.identifier)
-        item.image = $0.image
-        return item
+        $0.asMenuItem(self, #selector(handle(sender:)))
       }
       .forEach(menu.addItem)
     
@@ -35,7 +37,7 @@ public class ContextInteractableView: NSView {
   }
   
   @objc func handle(sender: NSMenuItem) {
-    actions.first { $0.identifier == sender.identifier?.rawValue }?.action()
+    flattedActions.first { $0.identifier == sender.identifier?.rawValue }?.action?()
   }
 }
 
@@ -61,6 +63,26 @@ private extension ContextInteractableView {
     } else {
       hostingView?.removeFromSuperview()
       hostingView = nil
+    }
+  }
+}
+
+private extension ContextAction {
+  func asMenuItem(_ target: AnyObject, _ selector: Selector) -> NSMenuItem {
+    if children.isEmpty {
+      let item = NSMenuItem(title: title, action: selector, keyEquivalent: "")
+      item.target = target
+      item.identifier = .init(identifier)
+      item.image = image
+      return item
+    } else {
+      let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+      let submenu = NSMenu(title: title)
+      children
+        .map { $0.asMenuItem(target, selector) }
+        .forEach(submenu.addItem)
+      item.submenu = submenu
+      return item
     }
   }
 }

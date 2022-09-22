@@ -30,6 +30,12 @@ struct ContentView: View {
               Button(action: { selectedAction = "SwiftUI, Left Label" }) {
                 Label("Left Label", systemImage: "arrow.left")
               }
+              
+              Menu("Left Submenu") {
+                Button(action: { }) {
+                  Label("Left Submenu Item", systemImage: "arrow.left")
+                }
+              }
             }
           
           Spacer()
@@ -39,6 +45,12 @@ struct ContentView: View {
             .contextMenu {
               Button(action: { selectedAction = "SwiftUI, Right Label" }) {
                 Label("Right Label", systemImage: "arrow.right")
+              }
+              
+              Menu("Right Submenu") {
+                Button(action: { }) {
+                  Label("Right Submenu Item", systemImage: "arrow.right")
+                }
               }
             }
         }
@@ -60,6 +72,19 @@ struct ContentView: View {
                   title: "Left Label",
                   image: .init(systemName: "arrow.left"),
                   action: { selectedAction = "ViewBoundContextMenu, Left Label" }
+                ),
+                .init(
+                  identifier: "submenuForLeftLabel",
+                  title: "Left Submenu",
+                  children: [
+                    .init(
+                      identifier: "submenuItemForLeftLabel",
+                      title: "Left Submenu Item",
+                      image: .init(systemName: "arrow.left"),
+                      action: { selectedAction = "ViewBoundContextMenu, Left Submenu Item" }
+                    )
+                  ],
+                  action: { }
                 )
               ]
             }
@@ -75,6 +100,19 @@ struct ContentView: View {
                   title: "Right Label",
                   image: .init(systemName: "arrow.right"),
                   action: { selectedAction = "ViewBoundContextMenu, Right Label" }
+                ),
+                .init(
+                  identifier: "submenuForRightLabel",
+                  title: "Right Submenu",
+                  children: [
+                    .init(
+                      identifier: "submenuItemForRightLabel",
+                      title: "Right Submenu Item",
+                      image: .init(systemName: "arrow.right"),
+                      action: { selectedAction = "ViewBoundContextMenu, Right Submenu Item" }
+                    )
+                  ],
+                  action: { }
                 )
               ]
             }
@@ -102,3 +140,11 @@ struct ContentView_Previews: PreviewProvider {
     ContentView()
   }
 }
+
+#if canImport(AppKit)
+private extension NSImage {
+  convenience init?(systemName: String) {
+    self.init(systemSymbolName: systemName, accessibilityDescription: nil)
+  }
+}
+#endif

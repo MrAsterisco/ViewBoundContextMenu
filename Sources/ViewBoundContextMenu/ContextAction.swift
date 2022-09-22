@@ -17,12 +17,20 @@ public struct ContextAction {
   let identifier: String
   let title: String
   let image: PlatformImage?
-  let action: () -> ()
+  let action: (() -> ())?
+  let children: [ContextAction]
   
-  public init(identifier: String, title: String, image: PlatformImage? = nil, action: @escaping () -> ()) {
+  public init(
+    identifier: String,
+    title: String,
+    image: PlatformImage? = nil,
+    children: [ContextAction] = [],
+    action: (() -> ())? = nil
+  ) {
     self.identifier = identifier
     self.title = title
     self.image = image
     self.action = action
+    self.children = children
   }
 }
