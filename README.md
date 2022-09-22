@@ -30,8 +30,9 @@ Text("Left Label")
       .init(
         identifier: "Unique Identifier",
         title: "Action Title",
-        image: nil, // Optional
-        action: { // Do something }
+        image: nil, // Optional,
+        children: [] // Optional,
+        action: { // Do something } // Passing `nil` will disable the menu item
       )
     ]
   }
@@ -43,8 +44,9 @@ The content of the menu is defined by an array of `ContextAction`:
 struct ContextAction {
   let identifier: String
   let title: String
-  let image: UImage?|NSImage? // Optional: images will not be displayed when targeting Mac Catalyst.
+  let image: UImage?|NSImage? // Optional: images will not be displayed when running on Mac Catalyst.
   let action: () -> ()
+  let children: [ContextAction] // Actions in this array will be displayed as submenu items.
 }
 ```
 
